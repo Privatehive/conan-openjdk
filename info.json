@@ -1,0 +1,13 @@
+{
+  "version": "19.0.2",
+  "projectName": "openjdk",
+  "projectDescription": "The OpenJDK",
+  "vendor": "Björn Stresing",
+  "contact": "bjoern.stresing@gmx.de",
+  "domain": "com.github.tereius",
+  "copyrightYear": "2023",
+  "repository": "https://github.com/Tereius/conan-openjdk",
+  "topics": ["java", "jdk", "openjdk"],
+  "homepage": "https://jdk.java.net",
+  "license": "GPL-2.0-with-classpath-exception"
+}
