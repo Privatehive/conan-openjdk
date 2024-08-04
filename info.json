@@ -4,9 +4,9 @@
   "projectDescription": "The OpenJDK",
   "vendor": "Björn Stresing",
   "contact": "bjoern.stresing@gmx.de",
-  "domain": "com.github.tereius",
+  "domain": "de.privatehive",
   "copyrightYear": "2023",
-  "repository": "https://github.com/Tereius/conan-openjdk",
+  "repository": "https://github.com/Privatehive/conan-openjdk",
   "topics": ["java", "jdk", "openjdk"],
   "homepage": "https://jdk.java.net",
   "license": "GPL-2.0-with-classpath-exception"
