@@ -71,7 +71,7 @@ class OpenJDK(ConanFile):
                 dst=os.path.join(self.package_folder, "lib"))
         copy(self, pattern="*",
                 src=os.path.join(source_folder, "jmods"),
-                dst=os.path.join(self.package_folder, "lib", "jmods"))
+                dst=os.path.join(self.package_folder, "jmods"))
         copy(self, pattern="*",
                 src=os.path.join(source_folder, "legal"),
                 dst=os.path.join(self.package_folder, "licenses"))
