@@ -6,7 +6,14 @@ jobs:
     name: "Linux"
     uses: Privatehive/conan-workflows/.github/workflows/createPackage.yml@master
     with:
-      image: "ubuntu-20.04"
+      image: "ubuntu-22.04"
+      conan_remotes: https://conan.privatehive.de/artifactory/api/conan/public-conan
+
+  build_linux_armv8:
+    name: "Linux"
+    uses: Privatehive/conan-workflows/.github/workflows/createPackage.yml@master
+    with:
+      image: "ubuntu-22.04-arm"
       conan_remotes: https://conan.privatehive.de/artifactory/api/conan/public-conan
 
   build_windows_x86_64:
@@ -14,6 +21,13 @@ jobs:
     uses: Privatehive/conan-workflows/.github/workflows/createPackage.yml@master
     with:
       image: "windows-2022"
+      conan_remotes: https://conan.privatehive.de/artifactory/api/conan/public-conan
+
+  build_macos_x86_64:
+    name: "Macos"
+    uses: Privatehive/conan-workflows/.github/workflows/createPackage.yml@master
+    with:
+      image: "macos-13"
       conan_remotes: https://conan.privatehive.de/artifactory/api/conan/public-conan
 
   build_macos_armv8:
@@ -26,7 +40,7 @@ jobs:
   upload_recipe:
     name: "Finalize"
     uses: Privatehive/conan-workflows/.github/workflows/uploadRecipe.yml@master
-    needs: [ build_linux_x86_64, build_windows_x86_64, build_macos_armv8 ]
+    needs: [ build_linux_x86_64, build_linux_armv8, build_windows_x86_64, build_macos_x86_64, build_macos_armv8 ]
     if: ${{ success() }}
     secrets: inherit
     with:

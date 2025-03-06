@@ -40,22 +40,22 @@ class OpenJDK(ConanFile):
     no_copy_source = True
 
     def validate(self):
-        if Version(self.version) < "19.0.2" and self.settings.arch != "x86_64":
-            raise ConanInvalidConfiguration("Unsupported Architecture. This package currently only supports x86_64.")
+        if self.settings.os == "Windows" and self.settings.arch != "x86_64" and Version(self.version) < "16.0.0":
+            raise ConanInvalidConfiguration("Unsupported Architecture for Windows. This package currently only supports x86_64 for versions < 16.0.0.")
         valid_os = ["Windows", "Linux", "Macos"]
         if str(self.settings.os) not in valid_os:
             raise ConanInvalidConfiguration(f"{self.name} {self.version} is only supported for the following operating systems: {valid_os}")
+        valid_arch = ["x86_64", "armv8"]
+        if str(self.settings.arch) not in valid_arch:
+            raise ConanInvalidConfiguration(f"{self.name} {self.version} is only supported for the following architectures on {self.settings.os}: {valid_arch}")
 
     def build(self):
-        key = self.settings.os
-        if self.settings.os == "Macos":
-            key = f"{self.settings.os}_{self.settings.arch}"
-        get(self, **self.conan_data["sources"][self.version][str(key)],
+        get(self, **self.conan_data["sources"][self.version][str(self.settings.os)][str(self.settings.arch)],
                   destination=self.source_folder, strip_root=True)
 
     def package(self):
         if self.settings.os == "Macos":
-            source_folder = os.path.join(self.source_folder, f"jdk-{self.version}.jdk", "Contents", "Home")
+            source_folder = os.path.join(self.source_folder, "zulu-%s.jdk" % Version(self.version).major, "Contents", "Home")
         else:
             source_folder = self.source_folder
         symlinks.remove_broken_symlinks(self, source_folder)
@@ -75,6 +75,12 @@ class OpenJDK(ConanFile):
         copy(self, pattern="*",
                 src=os.path.join(source_folder, "legal"),
                 dst=os.path.join(self.package_folder, "licenses"))
+        copy(self, pattern="*",
+                src=os.path.join(source_folder, "jre"),
+                dst=os.path.join(self.package_folder, "jre"))
+        copy(self, pattern="LICENSE",
+                src=source_folder,
+                dst=self.package_folder)
         # conf folder is required for security settings, to avoid
         # java.lang.SecurityException: Can't read cryptographic policy directory: unlimited
         # https://github.com/conan-io/conan-center-index/pull/4491#issuecomment-774555069
