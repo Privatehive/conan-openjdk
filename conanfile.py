@@ -5,7 +5,7 @@ from conan import ConanFile
 from conan.tools.files import copy, get, symlinks
 from conan.tools.scm import Version
 from conan.errors import ConanInvalidConfiguration
-import json, os
+import json, os, shutil, stat
 
 required_conan_version = ">=2.0"
 
@@ -13,8 +13,10 @@ class OpenJDK(ConanFile):
 
     jsonInfo = json.load(open("info.json", 'r'))
     # ---Package reference---
+    # version is intentionally not set here: it must be passed explicitly via
+    # `conan create . --version=X`, since conandata.yml declares sources for several
+    # versions at once (see CI, which builds all of them).
     name = jsonInfo["projectName"]
-    version = jsonInfo["version"]
     user = jsonInfo["domain"]
     channel = "stable"
     # ---Metadata---
@@ -50,6 +52,17 @@ class OpenJDK(ConanFile):
             raise ConanInvalidConfiguration(f"{self.name} {self.version} is only supported for the following architectures on {self.settings.os}: {valid_arch}")
 
     def build(self):
+        # self.source_folder is shared between the different os/arch package builds of
+        # the same version. Since each of them downloads a different archive here (instead
+        # of in source()), a stale extraction from a previous os/arch build (including
+        # read-only files such as lib/server/classes.jsa) must be removed first, otherwise
+        # extracting on top of it fails with a PermissionError.
+        if os.path.isdir(self.source_folder):
+            def _on_rm_error(func, path, exc_info):
+                os.chmod(path, stat.S_IWUSR)
+                func(path)
+            shutil.rmtree(self.source_folder, onerror=_on_rm_error)
+            os.makedirs(self.source_folder)
         get(self, **self.conan_data["sources"][self.version][str(self.settings.os)][str(self.settings.arch)],
                   destination=self.source_folder, strip_root=True)
 
